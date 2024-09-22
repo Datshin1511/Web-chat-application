@@ -1,0 +1,36 @@
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+}
+
+.scrollable-div{
+  height: 200px;
+  overflow-y: scroll;
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.message {
+  margin-bottom: 10px;
+}
+
+input {
+  flex-grow: 1;
+  padding: 10px;
+  margin-right: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #555;
+}
