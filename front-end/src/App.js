@@ -6,14 +6,14 @@ const socket = io.connect("http://localhost:3001");
 function App() {
   const [message, setMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
-  // const messageListRef = useRef(messageList)
+  const messageListRef = useRef(messageList)
 
   const [isLoggedIn, setLoggedState] = useState(false)
   const [username, setUsername] = useState("Anonymous")
 
-  // useEffect(() => {
-  //   messageListRef.current = messageList
-  // }, [messageList]);
+  useEffect(() => {
+    messageListRef.current = messageList
+  }, [messageList]);
 
   const sendMessage = () => {
     const messageData = {
@@ -23,7 +23,7 @@ function App() {
     };
 
     socket.emit("send_message", messageData);  
-    setMessageList([...messageList, messageData]); 
+    setMessageList((prev) => [...prev, messageData]); 
     setMessage("");
   };
 
@@ -31,11 +31,27 @@ function App() {
     setLoggedState(true)
   }
 
+  // useEffect(() => {
+  //   socket.on("receive_message", (data) => {
+  //     setMessageList([...messageList, data]); 
+  //   });
+  // }, [messageList]);
+
   useEffect(() => {
     socket.on("receive_message", (data) => {
-      setMessageList([...messageList, data]); 
+      const isDuplicate = messageListRef.current.some(
+        (msg) => msg.message === data.message && msg.time === data.time && msg.author === data.author
+      );
+
+      if (!isDuplicate) {
+        setMessageList((prev) => [...prev, data]);
+      }
     });
-  }, [messageList]);
+
+    return () => {
+      socket.off("receive_message"); 
+    };
+  }, []);
 
   if(!isLoggedIn){
     return(
@@ -61,9 +77,9 @@ function App() {
       <div className="App">
         <div className="container-lg">
 
-          <div className='d-flex align-items-center mb-4'>
-          <p className='h3'>Messages</p>
-          <p className='h6 fst-italic m-auto'>Signed in as: {username}</p>
+          <div className='d-flex justify-content-between align-items-center mb-4'>
+          <p className='h3 mb-0'>Messages</p>
+          <p className='h6 fst-italic mb-0'>Signed in as: {username}</p>
           </div>
 
           <div className="container-lg border border-black">
